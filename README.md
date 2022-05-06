@@ -35,5 +35,6 @@ ng s
 
 
 ## State of the Art:
+- Se algum jogador vencer, pintar o background vitorioso de verde e o resto de vermelho, se empatar, pintar todos os backgrounds de amarelo.
 - Criar tema escuro;
 - Fazer sistema de tradução, para inglês.
