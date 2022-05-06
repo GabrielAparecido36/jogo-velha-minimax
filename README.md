@@ -25,8 +25,6 @@ ng s
 
 - Informar quem é o player da rodada para jogar
 
-- Sistema de jogador que vencer, sinalizando e travando o jogo, oferendo botão para jogar novamente
-
 - Implementar o algoritimo minmax
 
 - Jogo contra minmax
@@ -36,5 +34,7 @@ ng s
 
 ## State of the Art:
 - Se algum jogador vencer, pintar o background vitorioso de verde e o resto de vermelho, se empatar, pintar todos os backgrounds de amarelo.
+
 - Criar tema escuro;
+
 - Fazer sistema de tradução, para inglês.
