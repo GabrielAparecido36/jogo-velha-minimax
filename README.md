@@ -1,22 +1,41 @@
-Instalção:
-Possuí Node e Angular instalados na sua máquina, rodar o comando "NPM I" para instalar as depências, rodar o projeto com o comando "ng s".
+## Instalação:
 
--------------------------------------------
+### Requisitos:
 
-Pedências:
-Fazer rodapé com copyrigth;
+- Node 8 ou superior
+- Angular CLI
 
-Fazer verificação de empate;
-Informar quem é o player da rodada pra jogar;
-Fazer sistema de jogador que vencer, sinalizando e travando o jogo, oferendo botão para jogar novamente;
+### Procedimento
 
-Implementar o algoritimo minmax;
-Fazer jogo contra minmax;
+Abra um terminal na pasta do projeto e digite o seguinte comando para instalar as dependências do projeto:
 
-Criar tela sobre;
+```sh
+npm install
+```
 
--------------------------------------------
+e posteriormente o seguinte comando para executar o serviço em si:
 
-DETALHES:
-Criar tema escuro;
-Fazer sistema de tradução, para inglês.
+```sh
+ng s
+```
+
+## Pedências:
+
+- Rodapé com copyright
+
+- Verificação de empate
+
+- Informar quem é o player da rodada para jogar
+
+- Sistema de jogador que vencer, sinalizando e travando o jogo, oferendo botão para jogar novamente
+
+- Implementar o algoritimo minmax
+
+- Jogo contra minmax
+
+- Tela sobre
+
+
+## State of the Art:
+- Criar tema escuro;
+- Fazer sistema de tradução, para inglês.
