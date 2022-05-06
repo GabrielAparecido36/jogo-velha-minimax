@@ -21,9 +21,7 @@ ng s
 
 ## Pedências:
 
-- Rodapé com copyright
-
-- Verificação de empate
+- Botão para recomeçar o jogo
 
 - Informar quem é o player da rodada para jogar
 

@@ -10,10 +10,11 @@ import { MenuItem } from 'primeng/api';
 export class AppComponent implements OnInit {
   public title = 'jogo-velha-minmax';
   public items: MenuItem[] = [];
-
+  public year: any;
   constructor(private router: Router) {}
 
   ngOnInit() {
+    this.year = new Date().getFullYear();
     this.items = [
       {
         label: 'Página inicial',
@@ -22,7 +23,7 @@ export class AppComponent implements OnInit {
           {
             label: 'Humano x Humano',
             icon: 'pi pi-play',
-            url: 'human',
+            url: 'pages/human',
           },
           {
             label: 'Humano x Minimax',

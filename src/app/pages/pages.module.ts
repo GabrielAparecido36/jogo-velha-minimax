@@ -1,12 +1,11 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AboutComponent } from './about/about.component';
+import { PagesComponent } from './pages.component';
 import { PagesRoutingModule } from './pages-routing.module';
-import { PlayHumanComponent } from './play-human/play-human.component';
+import { PlayHumanModule } from './play-human/play-human.module';
 
 @NgModule({
-  declarations: [AboutComponent, PlayHumanComponent],
-  exports:[PlayHumanComponent],
-  imports: [PagesRoutingModule, CommonModule],
+  declarations: [PagesComponent],
+  imports: [PagesRoutingModule, CommonModule, PlayHumanModule],
 })
 export class PagesModule {}

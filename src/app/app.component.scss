@@ -1,5 +1,15 @@
-::ng-deep{
-    .p-submenu-list{
-        width: 15em !important;
-    }
+.footer {
+  height: 3em;
+  border-top: solid 1px #212429;
+  width: 100%;
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  z-index: 999;
+}
+
+::ng-deep {
+  .p-submenu-list {
+    width: 15em !important;
+  }
 }

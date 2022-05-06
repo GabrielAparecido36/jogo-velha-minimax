@@ -4,8 +4,8 @@ import { PlayHumanComponent } from './pages/play-human/play-human.component';
 
 const routes: Routes = [
   {
-    path: '',
-    redirectTo: '/human',
+    path: '**',
+    redirectTo: 'pages/human',
     pathMatch: 'full',
   },
 ];
