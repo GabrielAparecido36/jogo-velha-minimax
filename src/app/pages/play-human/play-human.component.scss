@@ -1,0 +1,43 @@
+.main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .main .row:not(:first-child) {
+    border-top: 0.3em solid black;
+  }
+  
+  .row .column:not(:first-child) {
+    border-left: 0.3em solid black;
+  }
+  
+  .row {
+    display: flex;
+  }
+  
+  .cell {
+    height: 10em;
+    max-height: 10em;
+    width: 10em;
+    max-width: 10em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .cell:hover {
+    background: #add8e6;
+  }
+  
+  .populate-cell:hover {
+    background: #ff7f7f !important;
+    cursor: no-drop;
+  }
+  
+  .game-move{
+      font-size: 9em;
+  }
+  
