@@ -21,19 +21,14 @@ ng s
 
 ## Pedências:
 
-- Botão para recomeçar o jogo
-
-- Informar quem é o player da rodada para jogar
-
 - Implementar o algoritimo minmax
 
 - Jogo contra minmax
 
-- Tela sobre
-
 
 ## State of the Art:
-- Se algum jogador vencer, pintar o background vitorioso de verde e o resto de vermelho, se empatar, pintar todos os backgrounds de amarelo.
+
+- Tela sobre
 
 - Criar tema escuro;
 

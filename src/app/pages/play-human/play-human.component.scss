@@ -41,9 +41,33 @@
   font-size: 9em;
 }
 
+.win {
+  background: #90ee90;
+}
+
+.lose {
+  background: #ff7f7f;
+}
+
+.tied {
+  background: #fffcbb;
+}
+
+.win:hover {
+  background: #90ee90 !important;
+}
+
+.lose:hover {
+  background: #ff7f7f !important;
+}
+
+.tied:hover {
+  background: #fffcbb !important;
+}
+
 :host ::ng-deep {
   .p-toast-message-victory {
-    background-color: #ADD8E6;
+    background-color: #add8e6;
     border: solid blue;
     border-width: 0 0 0 6px;
     color: #2c1e30;
@@ -53,7 +77,7 @@
   }
 
   .p-toast-message-tied-game {
-    background-color: #FFFCBB;
+    background-color: #fffcbb;
     border: solid yellow;
     border-width: 0 0 0 6px;
     color: #2c1e30;

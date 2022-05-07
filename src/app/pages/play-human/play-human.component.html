@@ -4,11 +4,23 @@
       Jogo da velha (Humano x Humano)
     </h1>
   </div>
-  <div class="col-12 flex justify-content-center" *ngIf="victory !== -1">
-    <h2 class="mt-1">
-      {{victory ==  0 ? 'Empate!' : 'O Jogador '+ victory + ' é o vencedor!'}}
-    </h2>
-  </div>
+  <ng-container *ngIf="victory !== -1">
+    <div class="col-12 flex justify-content-center">
+      <h2 class="my-1">
+        {{
+          victory == 0 ? "Empate!" : "O Jogador " + victory + " é o vencedor!"
+        }}
+      </h2>
+    </div>
+    <div class="col-12 flex justify-content-center">
+      <p-button
+        label="Jogar novamente"
+        icon="pi pi-play"
+        styleClass="p-button"
+        (onClick)="restartGame()"
+      ></p-button>
+    </div>
+  </ng-container>
   <div class="col-12">
     <div class="main">
       <ng-container *ngFor="let row of rowArray; let i = index">
@@ -16,7 +28,15 @@
           <ng-container *ngFor="let row of rowArray; let j = index">
             <div class="column">
               <div
-                [ngClass]="{ 'populate-cell': positions[i][j] }"
+                [ngClass]="{
+                  'populate-cell': positions[i][j],
+                  'win': lineVictory.indexOf(i + ',' + j) != -1 && victory != -1,
+                  'lose':
+                    lineVictory.indexOf(i + ',' + j) == -1 &&
+                    victory != -1 &&
+                    victory != 0,
+                  'tied': victory == 0
+                }"
                 class="cell"
                 (click)="humanTurn(i, j)"
               >
@@ -29,6 +49,9 @@
         </div>
       </ng-container>
     </div>
+  </div>
+  <div class="col-12 flex justify-content-center" *ngIf="victory === -1">
+    <h3>Rodada atual: Jogador {{ currentPlayer }}.</h3>
   </div>
 </div>
 

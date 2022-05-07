@@ -12,6 +12,7 @@ export class PlayHumanComponent implements OnInit {
   public currentPlayer: number = 1;
   public victory: number = -1;
   public lockGame: boolean = false;
+  public lineVictory: any[] = [];
   constructor(private messageService: MessageService) {}
 
   ngOnInit(): void {
@@ -25,6 +26,15 @@ export class PlayHumanComponent implements OnInit {
         this.positions[i][j] = null;
       }
     }
+  }
+
+  public restartGame() {
+    this.victory = -1;
+    this.currentPlayer = 1;
+    this.lockGame = false;
+    this.lineVictory = [];
+    this.positions = [];
+    this.initPositions();
   }
 
   public humanTurn(row: number, column: number) {
@@ -50,11 +60,19 @@ export class PlayHumanComponent implements OnInit {
         (this.positions[0][2] == this.positions[1][1] &&
           this.positions[0][2] == this.positions[2][0]))
     ) {
-      this.positions[1][1] == 'O' ? (this.victory = 1) : (this.victory = 0);
+      if (
+        this.positions[0][0] == this.positions[1][1] &&
+        this.positions[0][0] == this.positions[2][2]
+      ) {
+        this.setLineVictory([`${0},${0}`, `${1},${1}`, `${2},${2}`]);
+      } else {
+        this.setLineVictory([`${0},${2}`, `${1},${1}`, `${2},${0}`]);
+      }
+      this.positions[1][1] == 'O' ? (this.victory = 1) : (this.victory = 2);
       this.messageService.add({
         severity: 'victory',
         summary: 'Vitória',
-        detail: `Jogador ${this.victory + 1} é o vencedor!`,
+        detail: `Jogador ${this.victory} é o vencedor!`,
         icon: 'pi-check-circle',
       });
       this.lockGame = true;
@@ -68,11 +86,12 @@ export class PlayHumanComponent implements OnInit {
         this.positions[0][i] == this.positions[1][i] &&
         this.positions[0][i] == this.positions[2][i]
       ) {
+        this.setLineVictory([`${0},${i}`, `${1},${i}`, `${2},${i}`]);
         this.positions[0][i] == 'O' ? (this.victory = 1) : (this.victory = 2);
         this.messageService.add({
           severity: 'victory',
           summary: 'Vitória',
-          detail: `Jogador ${this.victory + 1} é o vencedor!`,
+          detail: `Jogador ${this.victory} é o vencedor!`,
           icon: 'pi-check-circle',
         });
         this.lockGame = true;
@@ -84,11 +103,12 @@ export class PlayHumanComponent implements OnInit {
         this.positions[i][0] == this.positions[i][1] &&
         this.positions[i][0] == this.positions[i][2]
       ) {
+        this.setLineVictory([`${i},${0}`, `${i},${1}`, `${i},${2}`]);
         this.positions[i][0] == 'O' ? (this.victory = 1) : (this.victory = 2);
         this.messageService.add({
           severity: 'victory',
           summary: 'Vitória',
-          detail: `Jogador ${this.victory + 1} é o vencedor!`,
+          detail: `Jogador ${this.victory} é o vencedor!`,
           icon: 'pi-check-circle',
         });
         this.lockGame = true;
@@ -98,6 +118,7 @@ export class PlayHumanComponent implements OnInit {
 
     if (this.victory === -1 && this.verifyTiedGame()) {
       this.victory = 0;
+      this.lineVictory = [];
       this.messageService.add({
         severity: 'tied-game',
         summary: 'Empate',
@@ -118,5 +139,9 @@ export class PlayHumanComponent implements OnInit {
       }
     }
     return notFinish;
+  }
+
+  public setLineVictory(lineVictory: any[]) {
+    this.lineVictory = [...lineVictory];
   }
 }
