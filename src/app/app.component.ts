@@ -21,14 +21,14 @@ export class AppComponent implements OnInit {
         icon: 'pi pi-home',
         items: [
           {
+            label: 'Humano x Minimax',
+            icon: 'pi pi-play',
+            url: 'pages/minimax',
+          },
+          {
             label: 'Humano x Humano',
             icon: 'pi pi-play',
             url: 'pages/human',
-          },
-          {
-            label: 'Humano x Minimax',
-            icon: 'pi pi-play',
-            url: 'min-max',
           },
         ],
       },

@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { PagesComponent } from './pages.component';
 import { PlayHumanComponent } from './play-human/play-human.component';
+import { PlayMinimaxComponent } from './play-minimax/play-minimax.component';
 
 const routes: Routes = [
   {
@@ -11,6 +12,10 @@ const routes: Routes = [
       {
         path: 'human',
         component: PlayHumanComponent
+      },
+      {
+        path: 'minimax',
+        component: PlayMinimaxComponent
       },
     ],
   },

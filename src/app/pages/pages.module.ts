@@ -3,9 +3,10 @@ import { CommonModule } from '@angular/common';
 import { PagesComponent } from './pages.component';
 import { PagesRoutingModule } from './pages-routing.module';
 import { PlayHumanModule } from './play-human/play-human.module';
+import { PlayMinimaxModule } from './play-minimax/play-minimax.module';
 
 @NgModule({
   declarations: [PagesComponent],
-  imports: [PagesRoutingModule, CommonModule, PlayHumanModule],
+  imports: [PagesRoutingModule, CommonModule, PlayHumanModule, PlayMinimaxModule],
 })
 export class PagesModule {}
