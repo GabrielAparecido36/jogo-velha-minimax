@@ -1,1 +1,13 @@
-<p>about works!</p>
+<div class="grid pt-3">
+  <ng-container *ngFor="let developer of developers">
+    <div class="col-4 flex flex-column align-items-center">
+      <img [src]="developer.img" alt="" />
+      <h2 class="mb-0">
+        {{ developer.name }}
+      </h2>
+      <h2 class="mt-0 mb-1">{{ developer.rgm }}</h2>
+      <h3 class="mb-1">{{ developer.position }}</h3>
+      <label>{{ developer.resume }}</label>
+    </div>
+  </ng-container>
+</div>

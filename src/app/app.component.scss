@@ -1,3 +1,18 @@
+@import "../styles.scss";
+
+.general {
+  height: 100%;
+  width: 100%;
+}
+
+.icon-click {
+  cursor: pointer;
+}
+
+.dark {
+  background: black;
+}
+
 .footer {
   height: 3em;
   border-top: solid 1px #212429;
@@ -12,4 +27,5 @@
   .p-submenu-list {
     width: 15em !important;
   }
+
 }

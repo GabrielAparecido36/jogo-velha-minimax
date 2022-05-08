@@ -25,11 +25,6 @@ ng s
 
 - Jogo contra minmax
 
-
 ## State of the Art:
-
-- Tela sobre
-
-- Criar tema escuro;
 
 - Fazer sistema de tradução, para inglês.

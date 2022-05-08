@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 import { PagesModule } from './pages/pages.module';
 
 import { MenubarModule } from 'primeng/menubar';
+import { SharedModule } from 'primeng/api';
 
 @NgModule({
   declarations: [AppComponent],
@@ -17,6 +18,7 @@ import { MenubarModule } from 'primeng/menubar';
     MenubarModule,
     BrowserModule,
     BrowserAnimationsModule,
+    SharedModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

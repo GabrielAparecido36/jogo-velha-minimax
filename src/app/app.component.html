@@ -1,8 +1,23 @@
-<p-menubar [model]="items"></p-menubar>
-<div class="mt-3">
-  <router-outlet></router-outlet>
-</div>
-<div class="footer flex align-items-center justify-content-center mr-5">
-  Copyright (c) {{ year }} UNICSUL<br />
-  All Rights Reserved
+<div class="general">
+  <p-menubar [model]="items">
+    <ng-template pTemplate="end">
+      <i
+        class="pi mr-2 icon-click"
+        [ngClass]="theme == 'md-dark-indigo' ? 'pi-moon' : 'pi-sun'"
+        (click)="
+          theme == 'md-dark-indigo'
+            ? changeTheme('md-dark-indigo')
+            : changeTheme('md-light-indigo')
+        "
+        style="font-size: 1.5rem"
+      ></i>
+    </ng-template>
+  </p-menubar>
+  <div class="mt-3">
+    <router-outlet></router-outlet>
+  </div>
+  <div class="footer flex align-items-center justify-content-center mr-5">
+    Copyright (c) {{ year }} UNICSUL<br />
+    All Rights Reserved
+  </div>
 </div>
