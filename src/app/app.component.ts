@@ -37,10 +37,6 @@ export class AppComponent implements OnInit {
         ],
       },
       {
-        label: 'Configurações',
-        icon: 'pi pi-cog',
-      },
-      {
         label: 'Sobre',
         icon: 'pi pi-info-circle',
         url: 'pages/about',
