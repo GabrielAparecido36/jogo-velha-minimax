@@ -14,19 +14,21 @@ export class PlayMinimaxComponent implements OnInit {
   public lockGame: boolean = false;
   public lineVictory: any[] = [];
   public tree: any;
+  public stateNode: any;
 
   constructor(private messageService: MessageService) {}
 
   ngOnInit(): void {
     this.initPositions();
     this.createTree();
+    this.stateNode = this.tree.source
   }
 
   public initPositions() {
     for (let i = 0; i < 3; i++) {
       this.positions[i] = [];
       for (let j = 0; j < 3; j++) {
-        this.positions[i][j] = null;
+        this.positions[i][j] = undefined;
       }
     }
   }
@@ -133,7 +135,21 @@ export class PlayMinimaxComponent implements OnInit {
   }
 
   public CPUTurn(){
+    console.log(this.positions)
     this.addMove(this.positions, "O");
+
+    for (let i = 0; i < 3; i++) {
+      if (!this.compareArrays(this.stateNode.value[i], this.positions[i])) {
+        for (let j = 0; j < 3; j++) {
+          if (this.positions[i][j] != this.stateNode.value[i][j]) {
+            this.positions[i][j] = this.stateNode.value[i][j]
+            break;
+          }          
+        }
+        break;
+      }
+    }
+    console.log(this.positions)
   }
 
   public verifyTiedGame(): boolean {
@@ -159,7 +175,7 @@ export class PlayMinimaxComponent implements OnInit {
         if (!this.compareArrays(array[i], anotherArray[i])) {
           return false;
         }
-      } else if (array[i] !== anotherArray[i]) {
+      } else if (array[i] != anotherArray[i]) {
         return false;
       }
     }
@@ -169,7 +185,7 @@ export class PlayMinimaxComponent implements OnInit {
   public createNode(value: any, parent?: any) {
     let obj = {
       value,
-      parant: parent ? [parent] : [],
+      parent: parent ? [parent] : [],
       childrens: [],
       compare: (anotherNode: any) => {
         return this.compareArrays(obj.value, anotherNode.value);
@@ -214,8 +230,8 @@ export class PlayMinimaxComponent implements OnInit {
   }
 
   public mapMovementsGame(stateMatriz: any, move: any) {
-    let childrens = [...this.tree.stateNode.childrens];
-    this.tree.stateNode = childrens.find((children) =>
+    let childrens = [...this.stateNode.childrens];
+    this.stateNode = childrens.find((children) =>
       this.compareArrays(stateMatriz, children.value)
     );
 
@@ -240,12 +256,12 @@ export class PlayMinimaxComponent implements OnInit {
   }
 
   public addMove(stateMatriz: any, move: any) {
-    if (!this.tree.stateNode.parent.length) {
-      this.completePossibilites(this.tree.stateNode, move);
+    if (!this.stateNode.parent.length) {
+      this.completePossibilites(this.stateNode, move);
       move = 'X';
     }
     this.mapMovementsGame(stateMatriz, 'X');
-    this.findMove(this.tree.stateNode);
+    this.findMove(this.stateNode);
   }
 
   public completePossibilites(stateNode: any, move: any) {
@@ -272,8 +288,8 @@ export class PlayMinimaxComponent implements OnInit {
   }
 
   public findMove(node: any) {
-    const originalCall = node === this.tree.stateNode;
-    const stateNode = this.tree.stateNode;
+    const originalCall = node === this.stateNode;
+    const stateNode = this.stateNode;
     const moves: any = [];
 
     if (!node.childrens.length) {
@@ -281,14 +297,14 @@ export class PlayMinimaxComponent implements OnInit {
     } else {
       for (const next of node.childrens) {
         for (const parent of next.parent) {
-          this.tree.stateNode = parent;
+          this.stateNode = parent;
           const nextUtility = this.findMove(next);
           moves.push({ node: next, utility: nextUtility.utility });
         }
       }
     }
 
-    this.tree.stateNode = stateNode;
+    this.stateNode = stateNode;
     const move = moves.reduce((definedMove: any, move: any) =>
       move.utility >= definedMove.utility ? move : definedMove
     );
@@ -296,10 +312,9 @@ export class PlayMinimaxComponent implements OnInit {
       for (const localMove of moves) {
         localMove.utility += this.verifyUtility(localMove.node.value);
       }
-      this.tree.stateNode = moves.reduce((definedMove: any, move: any) =>
+      this.stateNode = moves.reduce((definedMove: any, move: any) =>
         move.utility > definedMove.utility ? move : definedMove
       ).node;
-      console.log(this.tree.stateNode);
     } else {
       return move;
     }
@@ -319,15 +334,15 @@ export class PlayMinimaxComponent implements OnInit {
     for (let i = 0; i <= 2; i++) {
       let line = matriz[i];
       const lineParentX = [
-        this.tree.stateNode.value[0][i],
-        this.tree.stateNode.value[1][i],
-        this.tree.stateNode.value[2][i],
+        this.stateNode.value[0][i],
+        this.stateNode.value[1][i],
+        this.stateNode.value[2][i],
       ];
       let column = [matriz[0][i], matriz[1][i], matriz[2][i]];
       const columnParentX = [
-        this.tree.stateNode.value[0][i],
-        this.tree.stateNode.value[1][i],
-        this.tree.stateNode.value[2][i],
+        this.stateNode.value[0][i],
+        this.stateNode.value[1][i],
+        this.stateNode.value[2][i],
       ];
       if (
         line.filter((value: any) => value === 'X').length === 3 ||
@@ -340,7 +355,7 @@ export class PlayMinimaxComponent implements OnInit {
     for (const valueDiagonal of valueDiagonals) {
       const diagonal = this.getDiagonal(matriz, valueDiagonal);
       const diagonalParent = this.getDiagonal(
-        this.tree.stateNode.value,
+        this.stateNode.value,
         valueDiagonal
       );
       if (diagonal.filter((value: any) => value === 'X').length === 3) {
@@ -352,7 +367,7 @@ export class PlayMinimaxComponent implements OnInit {
         if (diagonal[1] != diagonalParent[1] && diagonal[1] === 'X') {
           return 4;
         } else if (
-          !this.compareArrays(matriz[1], this.tree.stateNode.value[1])
+          !this.compareArrays(matriz[1], this.stateNode.value[1])
         ) {
           total += 2;
         }
@@ -366,9 +381,9 @@ export class PlayMinimaxComponent implements OnInit {
           for (const j of valueDiagonals) {
             const column = [matriz[0][j], matriz[1][j], matriz[2][j]];
             const columnParent = [
-              this.tree.stateNode.value[0][j],
-              this.tree.stateNode.value[1][j],
-              this.tree.stateNode.value[2][j],
+              this.stateNode.value[0][j],
+              this.stateNode.value[1][j],
+              this.stateNode.value[2][j],
             ];
             if (!this.compareArrays(column, columnParent)) {
               return 4;
@@ -381,11 +396,11 @@ export class PlayMinimaxComponent implements OnInit {
       let line = matriz[i];
       let column = [matriz[0][i], matriz[1][i], matriz[2][i]];
 
-      const lineParent = this.tree.stateNode.value[i];
+      const lineParent = this.stateNode.value[i];
       const columnParent = [
-        this.tree.stateNode.value[0][i],
-        this.tree.stateNode.value[1][i],
-        this.tree.stateNode.value[2][i],
+        this.stateNode.value[0][i],
+        this.stateNode.value[1][i],
+        this.stateNode.value[2][i],
       ];
       if (
         !this.compareArrays(line, lineParent) &&
