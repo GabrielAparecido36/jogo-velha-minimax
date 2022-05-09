@@ -18,13 +18,6 @@ e posteriormente o seguinte comando para executar o serviço em si:
 ```sh
 ng s
 ```
-
-## Pedências:
-
-- Implementar o algoritimo minmax
-
-- Jogo contra minmax
-
 ## State of the Art:
 
 - Fazer sistema de tradução, para inglês.
