@@ -20,8 +20,12 @@ export class PlayMinimaxComponent implements OnInit {
 
   ngOnInit(): void {
     this.initPositions();
+    this.initTree();
+  }
+
+  public initTree() {
     this.createTree();
-    this.stateNode = this.tree.source
+    this.stateNode = this.tree.source;
   }
 
   public initPositions() {
@@ -39,21 +43,19 @@ export class PlayMinimaxComponent implements OnInit {
     this.lockGame = false;
     this.lineVictory = [];
     this.positions = [];
+    this.initTree();
     this.initPositions();
   }
 
   public humanTurn(row: number, column: number) {
     if (this.lockGame) return;
     if (!this.positions[row][column]) {
-      if (this.currentPlayer === 1) {
-        this.positions[row][column] = 'O';
-        this.currentPlayer = 2;
-      }
-      this.verifyVictory();
+      this.positions[row][column] = 'O';
+      this.verifyVictory(true);
     }
   }
 
-  public verifyVictory() {
+  public verifyVictory(player: boolean = false) {
     // Verifica diagonal
     if (
       this.positions[1][1] &&
@@ -129,27 +131,25 @@ export class PlayMinimaxComponent implements OnInit {
       });
     }
 
-    if(this.victory === -1 && !this.verifyTiedGame()){
+    if (this.victory === -1 && !this.verifyTiedGame() && player) {
       this.CPUTurn();
     }
   }
 
-  public CPUTurn(){
-    console.log(this.positions)
-    this.addMove(this.positions, "O");
-
+  public CPUTurn() {
+    this.addMove(this.positions, 'O');
     for (let i = 0; i < 3; i++) {
       if (!this.compareArrays(this.stateNode.value[i], this.positions[i])) {
         for (let j = 0; j < 3; j++) {
           if (this.positions[i][j] != this.stateNode.value[i][j]) {
-            this.positions[i][j] = this.stateNode.value[i][j]
+            this.positions[i][j] = this.stateNode.value[i][j];
             break;
-          }          
+          }
         }
         break;
       }
     }
-    console.log(this.positions)
+    this.verifyVictory();
   }
 
   public verifyTiedGame(): boolean {
@@ -226,7 +226,7 @@ export class PlayMinimaxComponent implements OnInit {
         }
       }
     }
-    return false
+    return false;
   }
 
   public mapMovementsGame(stateMatriz: any, move: any) {
@@ -366,9 +366,7 @@ export class PlayMinimaxComponent implements OnInit {
       ) {
         if (diagonal[1] != diagonalParent[1] && diagonal[1] === 'X') {
           return 4;
-        } else if (
-          !this.compareArrays(matriz[1], this.stateNode.value[1])
-        ) {
+        } else if (!this.compareArrays(matriz[1], this.stateNode.value[1])) {
           total += 2;
         }
       } else if (
