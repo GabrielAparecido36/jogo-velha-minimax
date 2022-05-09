@@ -35,7 +35,7 @@ export class AboutComponent implements OnInit {
       {
         name: 'Murilo Amais Bracero',
         rgm: '2355617-0',
-        position: 'Back-end JR Developer',
+        position: 'Back-end PL Developer',
         resume:
           'Desenvolvedor Java Spring e Node há 3 anos no mercado de tecnologia.',
         img: '/assets/imgs/murilo.jpg',
