@@ -30,12 +30,11 @@
               <div
                 [ngClass]="{
                   'populate-cell': positions[i][j],
-                  'win': lineVictory.indexOf(i + ',' + j) != -1 && victory != -1,
-                  'lose':
+                  win: lineVictory.indexOf(i + ',' + j) != -1 && victory != -1,
+                  lose:
                     lineVictory.indexOf(i + ',' + j) == -1 &&
-                    victory != -1 &&
-                    victory != 0,
-                  'tied': victory == 0
+                    victory > 0,
+                  tied: victory == 0
                 }"
                 class="cell"
                 (click)="humanTurn(i, j)"
