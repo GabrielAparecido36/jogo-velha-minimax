@@ -15,6 +15,7 @@ export class PlayMinimaxComponent implements OnInit {
   public lineVictory: any[] = [];
   public tree: any;
   public stateNode: any;
+  public action = '>';
 
   constructor(private messageService: MessageService) {}
 
@@ -182,11 +183,12 @@ export class PlayMinimaxComponent implements OnInit {
     return true;
   }
 
-  public createNode(value: any, parent?: any) {
+  public createNode(value: any, parent?: any, player?: any) {
     let obj = {
       value,
-      parent: parent ? [parent] : [],
+      parent,
       childrens: [],
+      player,
       compare: (anotherNode: any) => {
         return this.compareArrays(obj.value, anotherNode.value);
       },
@@ -207,17 +209,15 @@ export class PlayMinimaxComponent implements OnInit {
   }
 
   public createAddNode(actual: any, node: any) {
-    if (node.compare(actual)) {
-      node.parent[0].childrens.push(actual);
-      actual.parent.push(node.parent[0]);
-      return true;
-    } else if (
-      node.parent.some((parent: any) => parent.compare(actual)) &&
-      !actual.childrens.some((childrenNode: any) =>
-        this.compareArrays(childrenNode.value, node.value)
-      )
-    ) {
-      actual.childrens.push(node);
+    if (actual.compare(node.parent) && !actual.childrens.some((children: any) => node.compare(children))) {
+      if (actual.parent) {
+        const childrenWithNode = actual.parent.childrens.find((children: any) => children.childrens.some((childrenChildren: any) => childrenChildren.compare(node)))
+        if (childrenWithNode) {
+          node = childrenWithNode.childrens.find((children: any) => children.compare(node))
+        }
+      }
+      
+      actual.childrens.push(node)
       return true;
     } else {
       for (const children of actual.childrens) {
@@ -230,10 +230,8 @@ export class PlayMinimaxComponent implements OnInit {
   }
 
   public mapMovementsGame(stateMatriz: any, move: any) {
-    let childrens = [...this.stateNode.childrens];
-    this.stateNode = childrens.find((children) =>
-      this.compareArrays(stateMatriz, children.value)
-    );
+    this.stateNode = this.stateNode.childrens.find((children: any) => this.compareArrays(stateMatriz, children.value));
+    let childrens = [this.stateNode];
 
     let lengthChildrens = childrens.length;
     while (lengthChildrens > 0) {
@@ -247,76 +245,75 @@ export class PlayMinimaxComponent implements OnInit {
       if (--lengthChildrens == 0) {
         lengthChildrens = childrens.length;
         move = move === 'X' ? 'O' : 'X';
-
-        if (lengthChildrens >= 80) {
-          break;
-        }
       }
     }
+    
   }
 
   public addMove(stateMatriz: any, move: any) {
-    if (!this.stateNode.parent.length) {
+    if (!this.stateNode.childrens.length) {
       this.completePossibilites(this.stateNode, move);
-      move = 'X';
+      this.mapMovementsGame(stateMatriz, 'X');
+    } else {
+      this.stateNode = this.stateNode.childrens.find((children: any) => this.compareArrays(stateMatriz, children.value));
     }
-    this.mapMovementsGame(stateMatriz, 'X');
-    this.findMove(this.stateNode);
+    this.getNextAction(this.stateNode)
+    this.findMove(this.stateNode, true);
   }
 
   public completePossibilites(stateNode: any, move: any) {
-    const copyMatriz = [
-      [...stateNode.value[0]],
-      [...stateNode.value[1]],
-      [...stateNode.value[2]],
-    ];
-    for (let i = 0; i <= 2; i++) {
-      for (let j = 0; j <= 2; j++) {
-        if (!copyMatriz[i][j]) {
-          copyMatriz[i] = [...stateNode.value[i]];
-          copyMatriz[i][j] = move;
-
-          const node = this.createNode(
-            [[...copyMatriz[0]], [...copyMatriz[1]], [...copyMatriz[2]]],
-            stateNode
-          );
-          this.tree.addNode(node);
+    if (!this.verifyUtility(stateNode.value)) {
+      const copyMatriz = [
+        [...stateNode.value[0]],
+        [...stateNode.value[1]],
+        [...stateNode.value[2]],
+      ];
+      for (let i = 0; i <= 2; i++) {
+        for (let j = 0; j <= 2; j++) {
+          if (!copyMatriz[i][j]) {
+            copyMatriz[i] = [...stateNode.value[i]];
+            copyMatriz[i][j] = move;
+  
+            const node = this.createNode(
+              [[...copyMatriz[0]], [...copyMatriz[1]], [...copyMatriz[2]]],
+              stateNode,
+              move
+            );
+            // stateNode.childrens.push(node);
+            stateNode.childrens.push(node)
+          }
         }
+        copyMatriz[i] = [...stateNode.value[i]];
       }
-      copyMatriz[i] = [...stateNode.value[i]];
     }
   }
 
-  public findMove(node: any) {
-    const originalCall = node === this.stateNode;
+  public findMove(node: any, originalCall: boolean) {
     const stateNode = this.stateNode;
     const moves: any = [];
 
     if (!node.childrens.length) {
-      return { node, utility: this.verifyUtility(node.value) };
+      node.utility = this.verifyUtility(node.value)
+      return node;
     } else {
       for (const next of node.childrens) {
-        for (const parent of next.parent) {
-          this.stateNode = parent;
-          const nextUtility = this.findMove(next);
-          moves.push({ node: next, utility: nextUtility.utility });
-        }
+        // for (const parent of next.parent) {
+          this.stateNode = next;
+          const nextUtility = this.findMove(next, false);
+          moves.push(nextUtility);
+        // }
       }
     }
-
+    
+    this.getNextAction(node);
     this.stateNode = stateNode;
-    const move = moves.reduce((definedMove: any, move: any) =>
-      move.utility >= definedMove.utility ? move : definedMove
-    );
+    const finalMove = moves.reduce(this.getMinMax.bind(this));
     if (originalCall) {
-      for (const localMove of moves) {
-        localMove.utility += this.verifyUtility(localMove.node.value);
-      }
-      this.stateNode = moves.reduce((definedMove: any, move: any) =>
-        move.utility > definedMove.utility ? move : definedMove
-      ).node;
+      const possibilitesMoves = moves.filter((move: any) => move.utility === finalMove.utility)
+      this.stateNode = possibilitesMoves[Math.floor(possibilitesMoves.length * (Math.random()))];
     } else {
-      return move;
+      node.utility = finalMove.utility;
+      return node;
     }
   }
 
@@ -331,95 +328,107 @@ export class PlayMinimaxComponent implements OnInit {
 
   public verifyUtility(matriz: any) {
     let total = 0;
-    for (let i = 0; i <= 2; i++) {
-      let line = matriz[i];
-      const lineParentX = [
-        this.stateNode.value[0][i],
-        this.stateNode.value[1][i],
-        this.stateNode.value[2][i],
-      ];
-      let column = [matriz[0][i], matriz[1][i], matriz[2][i]];
-      const columnParentX = [
-        this.stateNode.value[0][i],
-        this.stateNode.value[1][i],
-        this.stateNode.value[2][i],
-      ];
-      if (
-        line.filter((value: any) => value === 'X').length === 3 ||
-        column.filter((value: any) => value === 'X').length === 3
-      ) {
-        return 6;
-      }
-    }
-    const valueDiagonals = [0, 2];
-    for (const valueDiagonal of valueDiagonals) {
-      const diagonal = this.getDiagonal(matriz, valueDiagonal);
-      const diagonalParent = this.getDiagonal(
-        this.stateNode.value,
-        valueDiagonal
-      );
-      if (diagonal.filter((value: any) => value === 'X').length === 3) {
-        return 6;
-      } else if (
-        !this.compareArrays(diagonal, diagonalParent) &&
-        diagonal.filter((value: any) => value === 'O').length === 1
-      ) {
-        if (diagonal[1] != diagonalParent[1] && diagonal[1] === 'X') {
-          return 4;
-        } else if (!this.compareArrays(matriz[1], this.stateNode.value[1])) {
-          total += 2;
-        }
-      } else if (
-        !this.compareArrays(diagonal, diagonalParent) &&
-        diagonal.filter((value: any) => value === 'O').length === 2
-      ) {
-        if (diagonal[1] != diagonalParent[1] && diagonal[1] === 'X') {
-          return 4;
-        } else {
-          for (const j of valueDiagonals) {
-            const column = [matriz[0][j], matriz[1][j], matriz[2][j]];
-            const columnParent = [
-              this.stateNode.value[0][j],
-              this.stateNode.value[1][j],
-              this.stateNode.value[2][j],
-            ];
-            if (!this.compareArrays(column, columnParent)) {
-              return 4;
-            }
-          }
-        }
-      }
-    }
-    for (let i = 0; i <= 2; i++) {
-      let line = matriz[i];
-      let column = [matriz[0][i], matriz[1][i], matriz[2][i]];
+    let empties = 0;
+    // for (let i = 0; i < 3; i++) {
+    //   let line = matriz[i];
 
-      const lineParent = this.stateNode.value[i];
-      const columnParent = [
-        this.stateNode.value[0][i],
-        this.stateNode.value[1][i],
-        this.stateNode.value[2][i],
-      ];
-      if (
-        !this.compareArrays(line, lineParent) &&
-        line.filter((value: any) => value === 'O').length === 2
-      ) {
-        return 5;
-      } else if (
-        !this.compareArrays(column, columnParent) &&
-        column.filter((value: any) => value === 'O').length === 2
-      ) {
-        return 5;
-      } else if (line.filter((value: any) => value === 'O').length === 1) {
-        if (i == 1 && line[1] !== lineParent[1] && line[1] === 'X') {
-          return 4;
+    //   const lineParent = [
+    //     this.stateNode.value[i][0],
+    //     this.stateNode.value[i][1],
+    //     this.stateNode.value[i][2],
+    //   ];
+
+    //   const alteredLine = !this.compareArrays(line, lineParent)
+
+    //   for (let j = 0; j < 3; j++) {
+    //     let column = [matriz[0][j], matriz[1][j], matriz[2][j]];
+
+    //     const columnParent = [
+    //       this.stateNode.value[0][j],
+    //       this.stateNode.value[1][j],
+    //       this.stateNode.value[2][j],
+    //     ];
+  
+    //     const alteredColumn = !this.compareArrays(column, columnParent)
+  
+    //     if (line.filter((value: any) => value === 'X').length === 3 || column.filter((value: any) => value === 'X').length === 3) {
+    //       total = 1;
+    //       break;
+    //     } /*else if (alteredLine && line.filter((value: any) => value === 'O').length === 2 || alteredColumn && column.filter((value: any) => value === 'O').length === 2) {
+    //       return 1;
+    //     } */else if (line.filter((value: any) => value === 'O').length === 3 || column.filter((value: any) => value === 'O').length === 3) {
+    //       total = -1;
+    //       break;
+    //     } else {
+          
+    //     }
+    //   }
+
+    //   brancos += line.filter((value: any) => value != undefined).length
+    // }
+
+    for (let i = 0; i < 3; i++) {
+      const line = matriz[i];
+      if (line.filter((value: any) => value === 'X').length === 3 || line.filter((value: any) => value === 'O').length == 3) {
+        total = line[0] === 'X' ? 1 : -1;
+        break;
+      }
+    }
+
+    if (!total) {
+      for (let i = 0; i < 3; i++) {
+        const column = [matriz[0][i], matriz[1][i], matriz[2][i]];
+        if (column.filter((value: any) => value === 'X').length === 3 || column.filter((value: any) => value === 'O').length === 3) {
+          total = column[0] === 'X' ? 1 : -1;
+          break;
         }
+      }
+    }
+
+    if (!total) {
+      const valueDiagonals = [0, 2];
+      for (const valueDiagonal of valueDiagonals) {
+        const diagonal = this.getDiagonal(matriz, valueDiagonal);
+        const diagonalParent = this.getDiagonal(this.stateNode.value, valueDiagonal);
+
+        if (diagonal.filter((value: any) => value === 'X').length === 3 || diagonal.filter((value: any) => value === 'O').length === 3) {
+          total = diagonal[0] === 'X' ? 1 : -1;
+          break;
+        } /*else if (!this.compareArrays(diagonal, diagonalParent) && diagonal.filter((value: any) => value === 'O').length === 2) {
+          total = 1;
+          break;
+        } */
+      }
+    }
+
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (!matriz[i][j]) {
+          empties += 1;
+        }
+      }
+    }
+
+    return total * (empties + 1);
+  }
+
+  public getNextAction(node: any) {
+    this.action = node.player === 'O' ? '>' : '<'
+  }
+
+  public getMinMax(move1: any, move2: any) {
+    if (this.action === '>') {
+      if (move1.utility > move2.utility) {
+        return move1;
       } else {
-        total +=
-          0.33 * Math.max(line.filter((value: any) => value !== 'O').length, 0);
+        return move2;
+      }
+    } else if (this.action === '<') {
+      if (move1.utility < move2.utility) {
+        return move1;
+      } else {
+        return move2;
       }
     }
-
-    return total;
   }
 }
