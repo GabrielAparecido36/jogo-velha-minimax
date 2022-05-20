@@ -17,6 +17,9 @@ export class PlayMinimaxComponent implements OnInit {
   public stateNode: any;
   public action = '>';
 
+  public tempGame: any[] = [];
+  public winsGames: any[] = [];
+  public totalGames: number = 0;
   constructor(private messageService: MessageService) {}
 
   ngOnInit(): void {
@@ -38,6 +41,33 @@ export class PlayMinimaxComponent implements OnInit {
     }
   }
 
+  public testMinimax() {
+    if (this.totalGames == 2000) {
+      console.log('Testes finalizados');
+      return;
+    }
+    if (this.victory != -1) {
+      this.restartGame();
+    }
+    const i = Math.round(Math.random() * 2);
+    const j = Math.round(Math.random() * 2);
+    if (this.positions[i][j]) {
+      setTimeout(() => {
+        this.testMinimax();
+      }, 100);
+    } else {
+      document.getElementById(`${i},${j}`)?.click();
+      setTimeout(() => {
+        this.testMinimax();
+      }, 100);
+    }
+  }
+
+  public checkTests() {
+    console.log(this.winsGames);
+    console.log(this.totalGames);
+  }
+
   public restartGame() {
     this.victory = -1;
     this.currentPlayer = 1;
@@ -52,6 +82,7 @@ export class PlayMinimaxComponent implements OnInit {
     if (this.lockGame) return;
     if (!this.positions[row][column]) {
       this.positions[row][column] = 'O';
+      this.tempGame.push({ turn: 'player', row, column });
       this.verifyVictory(true);
     }
   }
@@ -74,13 +105,19 @@ export class PlayMinimaxComponent implements OnInit {
         this.setLineVictory([`${0},${2}`, `${1},${1}`, `${2},${0}`]);
       }
       this.positions[1][1] == 'O' ? (this.victory = 1) : (this.victory = 2);
-      this.messageService.add({
-        severity: 'victory',
-        summary: 'Vitória',
-        detail: `Jogador ${this.victory} é o vencedor!`,
-        icon: 'pi-check-circle',
-      });
+      // this.messageService.add({
+      //   severity: 'victory',
+      //   summary: 'Vitória',
+      //   detail: `Jogador ${this.victory} é o vencedor!`,
+      //   icon: 'pi-check-circle',
+      // });
       this.lockGame = true;
+      this.totalGames = this.totalGames + 1;
+      if (this.victory == 1) {
+        this.winsGames.push(this.winsGames);
+      } else {
+        this.tempGame = [];
+      }
       return;
     }
 
@@ -93,13 +130,19 @@ export class PlayMinimaxComponent implements OnInit {
       ) {
         this.setLineVictory([`${0},${i}`, `${1},${i}`, `${2},${i}`]);
         this.positions[0][i] == 'O' ? (this.victory = 1) : (this.victory = 2);
-        this.messageService.add({
-          severity: 'victory',
-          summary: 'Vitória',
-          detail: `Jogador ${this.victory} é o vencedor!`,
-          icon: 'pi-check-circle',
-        });
+        // this.messageService.add({
+        //   severity: 'victory',
+        //   summary: 'Vitória',
+        //   detail: `Jogador ${this.victory} é o vencedor!`,
+        //   icon: 'pi-check-circle',
+        // });
+        if (this.victory == 1) {
+          this.winsGames.push(this.winsGames);
+        } else {
+          this.tempGame = [];
+        }
         this.lockGame = true;
+        this.totalGames = this.totalGames + 1;
         return;
       }
       // Verifica linha
@@ -110,13 +153,20 @@ export class PlayMinimaxComponent implements OnInit {
       ) {
         this.setLineVictory([`${i},${0}`, `${i},${1}`, `${i},${2}`]);
         this.positions[i][0] == 'O' ? (this.victory = 1) : (this.victory = 2);
-        this.messageService.add({
-          severity: 'victory',
-          summary: 'Vitória',
-          detail: `Jogador ${this.victory} é o vencedor!`,
-          icon: 'pi-check-circle',
-        });
+        // this.messageService.add({
+        //   severity: 'victory',
+        //   summary: 'Vitória',
+        //   detail: `Jogador ${this.victory} é o vencedor!`,
+        //   icon: 'pi-check-circle',
+        // });
+        if (this.victory == 1) {
+          this.winsGames.push(this.winsGames);
+        } else {
+          this.tempGame = [];
+        }
+        ('');
         this.lockGame = true;
+        this.totalGames = this.totalGames + 1;
         return;
       }
     }
@@ -124,12 +174,13 @@ export class PlayMinimaxComponent implements OnInit {
     if (this.victory === -1 && this.verifyTiedGame()) {
       this.victory = 0;
       this.lineVictory = [];
-      this.messageService.add({
-        severity: 'tied-game',
-        summary: 'Empate',
-        detail: `Jogo empatado!`,
-        icon: 'pi-info-circle',
-      });
+      // this.messageService.add({
+      //   severity: 'tied-game',
+      //   summary: 'Empate',
+      //   detail: `Jogo empatado!`,
+      //   icon: 'pi-info-circle',
+      // });
+      this.tempGame = [];
     }
 
     if (this.victory === -1 && !this.verifyTiedGame() && player) {
@@ -144,6 +195,7 @@ export class PlayMinimaxComponent implements OnInit {
         for (let j = 0; j < 3; j++) {
           if (this.positions[i][j] != this.stateNode.value[i][j]) {
             this.positions[i][j] = this.stateNode.value[i][j];
+            this.tempGame.push({ turn: 'CPU', row: i, column: j });
             break;
           }
         }
@@ -209,15 +261,24 @@ export class PlayMinimaxComponent implements OnInit {
   }
 
   public createAddNode(actual: any, node: any) {
-    if (actual.compare(node.parent) && !actual.childrens.some((children: any) => node.compare(children))) {
+    if (
+      actual.compare(node.parent) &&
+      !actual.childrens.some((children: any) => node.compare(children))
+    ) {
       if (actual.parent) {
-        const childrenWithNode = actual.parent.childrens.find((children: any) => children.childrens.some((childrenChildren: any) => childrenChildren.compare(node)))
+        const childrenWithNode = actual.parent.childrens.find((children: any) =>
+          children.childrens.some((childrenChildren: any) =>
+            childrenChildren.compare(node)
+          )
+        );
         if (childrenWithNode) {
-          node = childrenWithNode.childrens.find((children: any) => children.compare(node))
+          node = childrenWithNode.childrens.find((children: any) =>
+            children.compare(node)
+          );
         }
       }
-      
-      actual.childrens.push(node)
+
+      actual.childrens.push(node);
       return true;
     } else {
       for (const children of actual.childrens) {
@@ -230,7 +291,9 @@ export class PlayMinimaxComponent implements OnInit {
   }
 
   public mapMovementsGame(stateMatriz: any, move: any) {
-    this.stateNode = this.stateNode.childrens.find((children: any) => this.compareArrays(stateMatriz, children.value));
+    this.stateNode = this.stateNode.childrens.find((children: any) =>
+      this.compareArrays(stateMatriz, children.value)
+    );
     let childrens = [this.stateNode];
 
     let lengthChildrens = childrens.length;
@@ -247,7 +310,6 @@ export class PlayMinimaxComponent implements OnInit {
         move = move === 'X' ? 'O' : 'X';
       }
     }
-    
   }
 
   public addMove(stateMatriz: any, move: any) {
@@ -255,9 +317,11 @@ export class PlayMinimaxComponent implements OnInit {
       this.completePossibilites(this.stateNode, move);
       this.mapMovementsGame(stateMatriz, 'X');
     } else {
-      this.stateNode = this.stateNode.childrens.find((children: any) => this.compareArrays(stateMatriz, children.value));
+      this.stateNode = this.stateNode.childrens.find((children: any) =>
+        this.compareArrays(stateMatriz, children.value)
+      );
     }
-    this.getNextAction(this.stateNode)
+    this.getNextAction(this.stateNode);
     this.findMove(this.stateNode, true);
   }
 
@@ -273,14 +337,14 @@ export class PlayMinimaxComponent implements OnInit {
           if (!copyMatriz[i][j]) {
             copyMatriz[i] = [...stateNode.value[i]];
             copyMatriz[i][j] = move;
-  
+
             const node = this.createNode(
               [[...copyMatriz[0]], [...copyMatriz[1]], [...copyMatriz[2]]],
               stateNode,
               move
             );
             // stateNode.childrens.push(node);
-            stateNode.childrens.push(node)
+            stateNode.childrens.push(node);
           }
         }
         copyMatriz[i] = [...stateNode.value[i]];
@@ -293,24 +357,27 @@ export class PlayMinimaxComponent implements OnInit {
     const moves: any = [];
 
     if (!node.childrens.length) {
-      node.utility = this.verifyUtility(node.value)
+      node.utility = this.verifyUtility(node.value);
       return node;
     } else {
       for (const next of node.childrens) {
         // for (const parent of next.parent) {
-          this.stateNode = next;
-          const nextUtility = this.findMove(next, false);
-          moves.push(nextUtility);
+        this.stateNode = next;
+        const nextUtility = this.findMove(next, false);
+        moves.push(nextUtility);
         // }
       }
     }
-    
+
     this.getNextAction(node);
     this.stateNode = stateNode;
     const finalMove = moves.reduce(this.getMinMax.bind(this));
     if (originalCall) {
-      const possibilitesMoves = moves.filter((move: any) => move.utility === finalMove.utility)
-      this.stateNode = possibilitesMoves[Math.floor(possibilitesMoves.length * (Math.random()))];
+      const possibilitesMoves = moves.filter(
+        (move: any) => move.utility === finalMove.utility
+      );
+      this.stateNode =
+        possibilitesMoves[Math.floor(possibilitesMoves.length * Math.random())];
     } else {
       node.utility = finalMove.utility;
       return node;
@@ -348,9 +415,9 @@ export class PlayMinimaxComponent implements OnInit {
     //       this.stateNode.value[1][j],
     //       this.stateNode.value[2][j],
     //     ];
-  
+
     //     const alteredColumn = !this.compareArrays(column, columnParent)
-  
+
     //     if (line.filter((value: any) => value === 'X').length === 3 || column.filter((value: any) => value === 'X').length === 3) {
     //       total = 1;
     //       break;
@@ -360,7 +427,7 @@ export class PlayMinimaxComponent implements OnInit {
     //       total = -1;
     //       break;
     //     } else {
-          
+
     //     }
     //   }
 
@@ -369,7 +436,10 @@ export class PlayMinimaxComponent implements OnInit {
 
     for (let i = 0; i < 3; i++) {
       const line = matriz[i];
-      if (line.filter((value: any) => value === 'X').length === 3 || line.filter((value: any) => value === 'O').length == 3) {
+      if (
+        line.filter((value: any) => value === 'X').length === 3 ||
+        line.filter((value: any) => value === 'O').length == 3
+      ) {
         total = line[0] === 'X' ? 1 : -1;
         break;
       }
@@ -378,7 +448,10 @@ export class PlayMinimaxComponent implements OnInit {
     if (!total) {
       for (let i = 0; i < 3; i++) {
         const column = [matriz[0][i], matriz[1][i], matriz[2][i]];
-        if (column.filter((value: any) => value === 'X').length === 3 || column.filter((value: any) => value === 'O').length === 3) {
+        if (
+          column.filter((value: any) => value === 'X').length === 3 ||
+          column.filter((value: any) => value === 'O').length === 3
+        ) {
           total = column[0] === 'X' ? 1 : -1;
           break;
         }
@@ -389,9 +462,15 @@ export class PlayMinimaxComponent implements OnInit {
       const valueDiagonals = [0, 2];
       for (const valueDiagonal of valueDiagonals) {
         const diagonal = this.getDiagonal(matriz, valueDiagonal);
-        const diagonalParent = this.getDiagonal(this.stateNode.value, valueDiagonal);
+        const diagonalParent = this.getDiagonal(
+          this.stateNode.value,
+          valueDiagonal
+        );
 
-        if (diagonal.filter((value: any) => value === 'X').length === 3 || diagonal.filter((value: any) => value === 'O').length === 3) {
+        if (
+          diagonal.filter((value: any) => value === 'X').length === 3 ||
+          diagonal.filter((value: any) => value === 'O').length === 3
+        ) {
           total = diagonal[0] === 'X' ? 1 : -1;
           break;
         } /*else if (!this.compareArrays(diagonal, diagonalParent) && diagonal.filter((value: any) => value === 'O').length === 2) {
@@ -413,7 +492,7 @@ export class PlayMinimaxComponent implements OnInit {
   }
 
   public getNextAction(node: any) {
-    this.action = node.player === 'O' ? '>' : '<'
+    this.action = node.player === 'O' ? '>' : '<';
   }
 
   public getMinMax(move1: any, move2: any) {

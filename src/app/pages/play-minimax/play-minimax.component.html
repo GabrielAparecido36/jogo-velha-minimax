@@ -4,6 +4,20 @@
       Jogo da velha (Humano x Minimax)
     </h1>
   </div>
+  <div class="col-12">
+    <p-button
+      label="Teste"
+      icon="pi pi-play"
+      styleClass="p-button"
+      (onClick)="testMinimax()"
+    ></p-button>
+    <p-button
+    label="Vitórias e quantidade de jogos"
+    icon="pi pi-play"
+    styleClass="p-button"
+    (onClick)="checkTests()"
+  ></p-button>
+  </div>
   <ng-container *ngIf="victory !== -1">
     <div class="col-12 flex justify-content-center">
       <h2 class="my-1">
@@ -32,14 +46,13 @@
               <div
                 [ngClass]="{
                   'populate-cell': positions[i][j],
-                  'win': lineVictory.indexOf(i + ',' + j) != -1 && victory != -1,
-                  'lose':
-                    lineVictory.indexOf(i + ',' + j) == -1 &&
-                    victory > 0,
-                  'tied': victory == 0
+                  win: lineVictory.indexOf(i + ',' + j) != -1 && victory != -1,
+                  lose: lineVictory.indexOf(i + ',' + j) == -1 && victory > 0,
+                  tied: victory == 0
                 }"
                 class="cell"
                 (click)="humanTurn(i, j)"
+                [id]="i+','+j"
               >
                 <span class="game-move">{{
                   positions[i][j] ? positions[i][j] : ""
